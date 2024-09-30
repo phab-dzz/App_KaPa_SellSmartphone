@@ -45,24 +45,25 @@ export default function App() {
 
             return <Ionicons name={iconName} size={size} color={color} />;
           },
-          tabBarActiveTintColor: 'tomato',
-          tabBarInactiveTintColor: 'gray',
+          tabBarActiveTintColor: '#b83b50',
+          tabBarInactiveTintColor: '#d1cfcf',
+          tabBarActiveTintColor: '#d1cfcf',
+          // tabBarStyle: {
+          //   backgroundColor: '#e0f7fa', // Màu nền của thanh điều hướng tab
+          // },
           tabBarStyle: {
-            backgroundColor: '#e0f7fa', // Màu nền của thanh điều hướng tab
-          },
-          tabBarStyle: {
-            backgroundColor: '#e0f7fa', // Màu nền thanh điều hướng tab
-            borderTopLeftRadius: 20, // Cong góc trên bên trái
-            borderTopRightRadius: 20, // Cong góc trên bên phải
+            backgroundColor: '#007380', // Màu nền thanh điều hướng tab
+            borderTopLeftRadius: 30, // Cong góc trên bên trái
+            borderTopRightRadius: 30, // Cong góc trên bên phải
             height: 60, // Chiều cao của thanh điều hướng tab
             overflow: 'hidden', // Đảm bảo các góc cong không bị cắt
           },
         })}
       >
-        <Tab.Screen name="Home" component={Home} />
-        <Tab.Screen name="Cart" component={Cart} />
-        <Tab.Screen name="Heart" component={Heart} />
-        <Tab.Screen name="Account" component={Account} />
+        <Tab.Screen name="Home" component={Home} options={{ headerShown: false }} />
+        <Tab.Screen name="Cart" component={Cart} options={{ headerShown: false }} />
+        <Tab.Screen name="Heart" component={Heart} options={{ headerShown: false }} />
+        <Tab.Screen name="Account" component={Account} options={{ headerShown: false }} />
 
       </Tab.Navigator>
     );
@@ -88,7 +89,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+
     alignItems: 'center',
     justifyContent: 'center',
   },

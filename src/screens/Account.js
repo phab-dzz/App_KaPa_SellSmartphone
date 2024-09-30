@@ -1,10 +1,22 @@
 import React from 'react'
-import { View, Text } from 'react-native'
+import { View, Text, StyleSheet } from 'react-native'
+import BookScreen from '../components/BookScreen'
 
-export default function account() {
+
+export default function Account() {
     return (
-        <View>
-            <Text>Account Screen</Text>
+
+        <View style={styles.container}>
+            <Text>Account</Text>
         </View>
+
     )
 }
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#3A6FB1',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+})
