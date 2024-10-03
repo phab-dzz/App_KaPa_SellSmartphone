@@ -1,7 +1,6 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
-import ZoomableView from '../components/ZoomableView'
-
+import AudiobookItem from '../components/AudiobookItem';
 const books = [
     { id: '1', title: 'Giao Tiếp Với Thiên Nhiên', image: require('../../img/book1.png') },
     { id: '2', title: 'Trải Nghiệm Khách Hàng', image: require('../../img/book2.png') },
@@ -11,11 +10,12 @@ const books = [
 ];
 export default function Cart() {
     return (
-        <View style={styles.container}>
-            {/* <BadgeExample />
-        <ItemBook /> */}
-            <Text>Heart</Text>
-        </View>
+        <AudiobookItem />
+        // <View style={styles.container}>
+        //     {/* <BadgeExample />
+        // <ItemBook /> */}
+        //     {/* <Text>Heart</Text> */}
+        // </View>
     )
 }
 const styles = StyleSheet.create({

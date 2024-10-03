@@ -20,15 +20,18 @@ export default function AudiobookItem() {
                 sound.unloadAsync();
             }
         };
-    }, []);
+    }, [sound]);
 
     const loadSound = async () => {
         const { sound } = await Audio.Sound.createAsync(
             { uri: 'https://res.cloudinary.com/dwjrf9fnz/video/upload/v1727879462/sachdongchay_lemecu.mp3' },
             {
-                shouldPlay: false, // Đặt shouldPlay là false để không tự động phát
+                // shouldPlay: false,
+                playAsync: false, // Đặt shouldPlay là false để không tự động phát
             }
         );
+
+
         sound.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate); // Đặt callback cập nhật trạng thái phát
         setSound(sound);
     };
@@ -76,7 +79,7 @@ export default function AudiobookItem() {
                 </TouchableOpacity>
             </View>
 
-            <View style={{ flex: 60, justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+            <View style={{ flex: 60, justifyContent: 'center', alert: 'center', width: '100%' }}>
                 <View style={{ flex: 70, alignItems: 'center' }}>
                     <Image source={require('../../img/book1.png')} style={{ width: 200, height: 280, borderRadius: 50 }} />
                 </View>
@@ -107,7 +110,9 @@ export default function AudiobookItem() {
                     <Pressable>
                         <Ionicons name="play-skip-back" size={24} color="#fff" />
                     </Pressable>
-                    <Pressable>
+                    <Pressable
+                        onPress={() => setPosition(position - 10)}
+                    >
                         <Image source={require('../../img/forward.png')} style={{ width: 20, height: 20 }} />
                     </Pressable>
                     <Pressable
@@ -119,11 +124,13 @@ export default function AudiobookItem() {
                             borderRadius: 50,
                             backgroundColor: '#576796'
                         }}
-                        onPress={playPauseAudio}
+                        onPress={() => playPauseAudio}
                     >
-                        <Ionicons name={isPlaying ? "play" : "pause-circle-outline"} size={40} color="#fff" />
+                        <Ionicons name={isPlaying ? "pause-circle-outline" : "play"} size={40} color="#fff" />
                     </Pressable>
-                    <Pressable>
+                    <Pressable
+                        onPress={() => setPosition(position + 10)}
+                    >
                         <Ionicons name="refresh-outline" size={28} color="#fff" />
                     </Pressable>
                     <Pressable>
@@ -133,7 +140,7 @@ export default function AudiobookItem() {
                 <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
                     <Pressable style={styles.item}>
                         <Ionicons name="moon" size={26} color="#fff" />
-                        <Text>Hẹn giờ1</Text>
+                        <Text>Hẹn giờ</Text>
                     </Pressable>
                     <Pressable style={styles.item}>
                         <Ionicons name="list-outline" size={26} color="#fff" />

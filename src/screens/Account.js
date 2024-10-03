@@ -1,14 +1,14 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import BookScreen from '../components/BookScreen'
-
+import AudiobookItem from '../components/AudiobookItem'
 
 export default function Account() {
     return (
-
-        <View style={styles.container}>
-            <Text>Account</Text>
-        </View>
+        <AudiobookItem />
+        // <View style={styles.container}>
+        //     <Text>Account</Text>
+        // </View>
 
     )
 }
