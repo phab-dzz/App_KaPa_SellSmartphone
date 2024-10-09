@@ -5,10 +5,10 @@ import AudiobookItem from '../components/AudiobookItem'
 
 export default function Account() {
     return (
-        <AudiobookItem />
-        // <View style={styles.container}>
-        //     <Text>Account</Text>
-        // </View>
+        // <AudiobookItem />
+        <View style={styles.container}>
+            <Text>Account</Text>
+        </View>
 
     )
 }

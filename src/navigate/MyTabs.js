@@ -35,9 +35,9 @@ export default function MyTabs() {
                 // tabBarActiveTintColor: '#b83b50',
                 // tabBarInactiveTintColor: '#d1cfcf',
                 // tabBarActiveTintColor: '#d1cfcf',
-                barStyle: {
-                    backgroundColor: 'red', // Thay màu nền ở đây
-                },
+                // barStyle: {
+                //     backgroundColor: 'red', // Thay màu nền ở đây
+                // },
                 tabBarLabel: '•', // Đổi thành dấu chấm cho tất cả các tab
                 tabBarActiveTintColor: 'red', // Màu khi tab được click
                 tabBarInactiveTintColor: '#d1cfcf',

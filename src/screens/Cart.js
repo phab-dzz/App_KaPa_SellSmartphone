@@ -10,12 +10,12 @@ const books = [
 ];
 export default function Cart() {
     return (
-        <AudiobookItem />
-        // <View style={styles.container}>
-        //     {/* <BadgeExample />
-        // <ItemBook /> */}
-        //     {/* <Text>Heart</Text> */}
-        // </View>
+        // <AudiobookItem />
+        <View style={styles.container}>
+            {/* <BadgeExample />
+        <ItemBook /> */}
+            <Text>Cart</Text>
+        </View>
     )
 }
 const styles = StyleSheet.create({

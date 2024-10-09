@@ -8,7 +8,8 @@ export default function Heart() {
         <View style={styles.container}>
             {/* <BadgeExample />
             <ItemBook /> */}
-            <TimerDialog />
+            {/* <TimerDialog /> */}
+            <Text>Heart</Text>
         </View>
     )
 }

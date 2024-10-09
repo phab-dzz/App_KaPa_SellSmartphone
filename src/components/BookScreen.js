@@ -3,6 +3,7 @@ import { View, Text, Image, ScrollView, FlatList, TouchableOpacity, StyleSheet }
 import ZoomableView from './ZoomableView';
 import BadgeExample from './BadgeExample';
 import ItemBook from './ItemBook';
+import { LinearGradient } from 'expo-linear-gradient';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 const books = [
     { id: '1', title: 'Giao Tiếp Với Thiên Nhiên', image: require('../../img/book1.png') },
@@ -15,38 +16,43 @@ const books = [
 
 export default function BookScreen({ navigation }) {
     return (
-        <View style={styles.container}>
+        <LinearGradient
+            // Màu sắc bắt đầu và kết thúc của gradient
+            colors={['#007380', '#108794', '#1eaaba']}
+            style={styles.gradient}
+        >
+            <View style={styles.container}>
 
-            <View style={styles.header}>
+                <View style={styles.header}>
 
-                <Text style={styles.logo}>KaPeBooks</Text>
-                <TouchableOpacity>
-                    <Text style={styles.profileButton}>K</Text>
-                </TouchableOpacity>
-            </View>
-            <ScrollView vertical showsVerticalScrollIndicator={false} >
-                <View style={{
-                    marginBottom: 5,
-                    height: 60,
-
-                }}>
-                    <BadgeExample />
+                    <Text style={styles.logo}>KaPeBooks</Text>
+                    <TouchableOpacity>
+                        <Text style={styles.profileButton}>K</Text>
+                    </TouchableOpacity>
                 </View>
+                <ScrollView vertical showsVerticalScrollIndicator={false} >
+                    <View style={{
+                        marginBottom: 5,
+                        height: 60,
 
-                <View style={{ height: 250 }}>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.mainBookScroll}>
+                    }}>
+                        <BadgeExample />
+                    </View>
 
-                        {books.map((book) => {
-                            return (
-                                <TouchableOpacity style={styles.bookCard}>
-                                    <ZoomableView image={book.image} title={book.title} />
-                                </TouchableOpacity>
-                            );
-                        })}
-                    </ScrollView>
-                </View>
+                    <View style={{ height: 250 }}>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.mainBookScroll}>
 
-                {/* <FlatList
+                            {books.map((book) => {
+                                return (
+                                    <TouchableOpacity style={styles.bookCard}>
+                                        <ZoomableView image={book.image} title={book.title} />
+                                    </TouchableOpacity>
+                                );
+                            })}
+                        </ScrollView>
+                    </View>
+
+                    {/* <FlatList
                     horizontal
                     data={books}
                     keyExtractor={(item) => item.id}
@@ -62,59 +68,65 @@ export default function BookScreen({ navigation }) {
 
 
 
-                {/* Popular Books Section */}
-                <View style={styles.popularBooksSection}>
-                    <TouchableOpacity
-                        style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
+                    {/* Popular Books Section */}
+                    <View style={styles.popularBooksSection}>
+                        <TouchableOpacity
+                            style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
 
-                        onPress={() => navigation.navigate('rank')}
-                    >
+                            onPress={() => navigation.navigate('rank')}
+                        >
+                            {/* <Image source={{uri: 'https://img.icons8.com/ios/452/reading.png'}} style={{ width: 24, height: 24 }} /> */}
 
-                        <Text style={styles.sectionTitle}>Top sách thịnh hành</Text>
-                        <Ionicons name="chevron-forward" size={24} color="black" />
-                    </TouchableOpacity>
+                            <Text style={styles.sectionTitle}>Top sách thịnh hành</Text>
+                            <Ionicons name="chevron-forward" size={24} color="black" />
+                        </TouchableOpacity>
 
 
-                    <FlatList
-                        horizontal
-                        data={books}
-                        keyExtractor={(item) => item.id}
-                        renderItem={({ item }) => (
-                            <TouchableOpacity style={styles.popularBookCard}>
-                                <Image source={item.image} style={styles.popularBookImage} />
-                                <Text style={styles.popularBookTitle}>{item.title}</Text>
-                            </TouchableOpacity>
-                        )}
-                        showsHorizontalScrollIndicator={false}
-                    />
-                </View>
-                <View style={{ marginTop: 32, paddingLeft: 16, }}>
-                    <Text style={styles.sectionTitle}>Mới xuất bản</Text>
-                    <FlatList
+                        <FlatList
+                            horizontal
+                            data={books}
+                            keyExtractor={(item) => item.id}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity style={styles.popularBookCard}>
+                                    <Image source={item.image} style={styles.popularBookImage} />
+                                    <Text style={styles.popularBookTitle}>{item.title}</Text>
+                                </TouchableOpacity>
+                            )}
+                            showsHorizontalScrollIndicator={false}
+                        />
+                    </View>
+                    <View style={{ marginTop: 32, paddingLeft: 16, }}>
+                        <Text style={styles.sectionTitle}>Mới xuất bản</Text>
+                        <FlatList
 
-                        data={books}
-                        keyExtractor={(item) => item.id}
-                        renderItem={({ item }) => (
-                            <TouchableOpacity style={{}}>
-                                <ItemBook url={item.image} title={item.title} />
-                            </TouchableOpacity>
-                        )}
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}
-                    />
+                            data={books}
+                            keyExtractor={(item) => item.id}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity style={{}}>
+                                    <ItemBook url={item.image} title={item.title} />
+                                </TouchableOpacity>
+                            )}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}
+                        />
 
-                </View>
-            </ScrollView>
-        </View>
+                    </View>
+                </ScrollView>
+            </View>
+        </LinearGradient>
     );
 }
 
 const styles = StyleSheet.create({
+    gradient: {
+        flex: 1, // Chiếm toàn bộ không gian
+
+    },
     container: {
         marginTop: 20,
         flex: 1,
-        backgroundColor: '#b6b7f7',
+        // backgroundColor: '#b6b7f7',
     },
     header: {
         flexDirection: 'row',
