@@ -1,23 +1,31 @@
 import React from 'react';
+import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import LoginScreen from './src/screens/Login'; 
-import RegistrationScreen from './src/screens/Registration';
-import AudioBookScreen from './src/screens/Audiobook';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import MyTabs from './src/navigate/MyTabs';
+import Login from './src/screens/Login'; // Capitalize component name
+import Registration from './src/screens/Registration'; // Capitalize component name
 
 const Stack = createStackNavigator();
 
-const App = () => {
+export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="AudioBook">
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Registration" component={RegistrationScreen} />
-        <Stack.Screen name="AudioBook" component={AudioBookScreen} />
-
-      </Stack.Navigator>
-    </NavigationContainer>
+    <GestureHandlerRootView style={styles.container}>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Login">
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="Registration" component={Registration} />
+          <Stack.Screen name="MyTabs" component={MyTabs} options={{headerShown: false}}/>
+        </Stack.Navigator>
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
-};
+}
 
-export default App;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#1eaaba',
+  },
+});

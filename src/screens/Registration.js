@@ -56,7 +56,7 @@ const RegistrationScreen = (props ) => {
                   value={email}
                   onChangeText={(text) => setEmail(text)}   // Cập nhật state email
                 />
-                <Icon name="envelope" size={20} color="#A3A3A3" />
+                <Icon name="envelope" size={16} color="#A3A3A3" />
               </View>
 
               {/* Input username */}
@@ -106,19 +106,19 @@ const RegistrationScreen = (props ) => {
                   onPress={() => {}}
                   style={styles.socialIcon}
                 >
-                  <Image source={GooglePNG} style={{ height: 24, width: 24 }} />
+                  <Image source={GooglePNG} style={{ height: 28, width: 24 }} />
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {}}
                   style={styles.socialIcon}
                 >
-                  <Image source={FacebookPNG} style={{ height: 24, width: 24 }} />
+                  <Image source={FacebookPNG} style={{ height: 28, width: 24 }} />
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {}}
                   style={styles.socialIcon}
                 >
-                  <Image source={TwitterPNG} style={{ height: 24, width: 24 }} />
+                  <Image source={TwitterPNG} style={{ height: 28, width: 24 }} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -198,6 +198,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderRadius: 10,
     paddingHorizontal: 16,
+  },
+  passwordInput: {
+    flex: 1,
+    color: "#A3A3A3",
+    fontSize: 14,
+    fontWeight: "bold",
   },
   signupButton: {
     backgroundColor: "#34C8E8",
