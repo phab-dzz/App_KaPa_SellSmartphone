@@ -13,9 +13,9 @@ import {
   TextInput,
 } from "react-native";
 import Icon from 'react-native-vector-icons/FontAwesome';
-import GooglePNG from '../../assets/Wrappergg.png';
-import FacebookPNG from '../../assets/Shapeapple.png';
-import ApplePNG from '../../assets/Shapefb.png';
+import GooglePNG from '../../assets/Login/Wrappergg.png';
+import FacebookPNG from '../../assets/Login/Shapeapple.png';
+import ApplePNG from '../../assets/Login/Shapefb.png';
 
 const LoginScreen = (props) => {
   const navigation = useNavigation();
@@ -34,7 +34,7 @@ const LoginScreen = (props) => {
   return (
     <SafeAreaView style={styles.container}>
       <ImageBackground
-        source={require('../../assets/image 20bg.png')}
+        source={require('../../assets/Login/image 20bg.png')}
         style={styles.backgroundImage}
         resizeMode="cover"
       >

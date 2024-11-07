@@ -1,77 +1,123 @@
-import React, { useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, Animated, Easing, Image } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { View, Text, Image, StyleSheet, Dimensions, Animated } from 'react-native';
 import Carousel from 'react-native-snap-carousel';
 
-const { width: screenWidth } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
-const ImageSlide = () => {
-  const data = [
-    { title: 'Hình ảnh 1', image: require('../../assets/BookScreen/profile.png') },
-    { title: 'Hình ảnh 2', image: require('../../assets/BookScreen/profile.png') },
-    { title: 'Hình ảnh 3', image: require('../../assets/BookScreen/profile.png') },
-  ];
+// Kích thước của ảnh giữa
+const centerImageWidth = 220;
+const centerImageHeight = 290;
 
-  const animatedValue = useRef(new Animated.Value(0)).current;
+const images = [
+  {
+    uri: 'https://s3-alpha-sig.figma.com/img/7793/2fde/cf7795a9489ed315dae2bcf7375f0c7e?Expires=1731283200&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=YMF8uFRAubG7XYSTTPupI~eZlMzC0O-m9-t29t3ey61DtP8HgWIDlS1FwTv85XedWUbpsrN8ggdgYsaz0UqMdOqbFyKscHkBoZZbsTID9hSjAE82uWuO545ykRzHA7WSQDKopnZlUqHQKtOlj0OnPVoa4iWuExTAAKrYjHDCrVCa3oXLiFhBBelI3MCDR-Vw1~5ua2ci~iU8esUgo2NE6G2duq287NtRzbZhWQOuIXMe6XtZdWr~L64uz381zx9YUoVc0Ns9DKmJrkrtufZPNV7mXyUQnb4Qr1mCYrnaJbYLsnvxkN2C3rrgCQt~4G44cD0afUujSvvbLb~mEwwP5w__',
+    description: 'Sách nói mới',
+  },
+  {
+    uri: 'https://s3-alpha-sig.figma.com/img/7793/2fde/cf7795a9489ed315dae2bcf7375f0c7e?Expires=1731283200&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=YMF8uFRAubG7XYSTTPupI~eZlMzC0O-m9-t29t3ey61DtP8HgWIDlS1FwTv85XedWUbpsrN8ggdgYsaz0UqMdOqbFyKscHkBoZZbsTID9hSjAE82uWuO545ykRzHA7WSQDKopnZlUqHQKtOlj0OnPVoa4iWuExTAAKrYjHDCrVCa3oXLiFhBBelI3MCDR-Vw1~5ua2ci~iU8esUgo2NE6G2duq287NtRzbZhWQOuIXMe6XtZdWr~L64uz381zx9YUoVc0Ns9DKmJrkrtufZPNV7mXyUQnb4Qr1mCYrnaJbYLsnvxkN2C3rrgCQt~4G44cD0afUujSvvbLb~mEwwP5w__',
+    description: 'Top 10 sách bán chạy',
+  },
+  {
+    uri: 'https://s3-alpha-sig.figma.com/img/7793/2fde/cf7795a9489ed315dae2bcf7375f0c7e?Expires=1731283200&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=YMF8uFRAubG7XYSTTPupI~eZlMzC0O-m9-t29t3ey61DtP8HgWIDlS1FwTv85XedWUbpsrN8ggdgYsaz0UqMdOqbFyKscHkBoZZbsTID9hSjAE82uWuO545ykRzHA7WSQDKopnZlUqHQKtOlj0OnPVoa4iWuExTAAKrYjHDCrVCa3oXLiFhBBelI3MCDR-Vw1~5ua2ci~iU8esUgo2NE6G2duq287NtRzbZhWQOuIXMe6XtZdWr~L64uz381zx9YUoVc0Ns9DKmJrkrtufZPNV7mXyUQnb4Qr1mCYrnaJbYLsnvxkN2C3rrgCQt~4G44cD0afUujSvvbLb~mEwwP5w__',
+    description: 'Podcast mới',
+  },
+  // Thêm các ảnh và mô tả khác ở đây
+];
+
+const MyCarousel = () => {
+  const [activeIndex, setActiveIndex] = useState(0); // Trạng thái chỉ số ảnh đang hoạt động
+  const animatedValues = useRef(
+    images.map(() => ({
+      translateY: new Animated.Value(20),
+      opacity: new Animated.Value(0),
+    }))
+  ).current;
 
   const renderItem = ({ item, index }) => {
-    const scale = animatedValue.interpolate({
-      inputRange: data.map((_, i) => i),
-      outputRange: data.map((_, i) => (i === index ? 1.1 : 0.9)),
-      extrapolate: 'clamp',
-    });
+    const { translateY, opacity } = animatedValues[index];
+
+    // Cập nhật animation khi ảnh ở giữa
+    Animated.timing(translateY, {
+      toValue: activeIndex === index ? -15 : 20,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+
+    Animated.timing(opacity, {
+      toValue: activeIndex === index ? 1 : 0,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
 
     return (
-      <Animated.View style={[styles.slide, { transform: [{ scale }] }]}>
-        <Image source={item.image} style={styles.image} />
-        <Text style={styles.title}>{item.title}</Text>
-      </Animated.View>
+      <View style={styles.slide}>
+        <Image source={{ uri: item.uri }} style={styles.image} />
+        <Animated.View
+          style={[
+            styles.textContainer,
+            { opacity, transform: [{ translateY }] },
+          ]}
+        >
+          <View style={styles.iconWithText}>
+          <Image source={require("../../assets/slide/saoSlide.png")} style={styles.icon} />
+          <Text style={styles.text}>{item.description}</Text>
+        </View>
+        </Animated.View>
+      </View>
     );
   };
 
-  const handleSnapToItem = (index) => {
-    Animated.timing(animatedValue, {
-      toValue: index,
-      duration: 300,
-      easing: Easing.out(Easing.ease),
-      useNativeDriver: false,
-    }).start();
-  };
-
   return (
-    <View style={styles.container}>
-      <Carousel
-        data={data}
-        renderItem={renderItem}
-        sliderWidth={screenWidth}
-        itemWidth={screenWidth}
-        onSnapToItem={handleSnapToItem}
-      />
-    </View>
+    <Carousel
+      data={images}
+      renderItem={renderItem}
+      sliderWidth={width}
+      itemWidth={centerImageWidth}
+      layout="default"
+      inactiveSlideScale={0.8}
+      inactiveSlideOpacity={0.5}
+      onSnapToItem={(index) => setActiveIndex(index)} // Cập nhật chỉ số khi kéo
+    />
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   slide: {
-    width: screenWidth,
-    height: 300,
-    justifyContent: 'center',
+    borderRadius: 10,
     alignItems: 'center',
+    justifyContent: 'flex-end', // Đặt nội dung ở dưới cùng
   },
   image: {
-    width: '100%',
-    height: '80%', // Chiều cao của hình ảnh
-    borderRadius: 10,
+    width: centerImageWidth,
+    height: 310,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
   },
-  title: {
-    fontSize: 24,
-    color: '#000',
-    marginTop: 10,
+  textContainer: {
+    position: 'absolute',
+    bottom: -20,
+    left: 0,
+    right: 0,
+    backgroundColor: 'white', // Nền màu trắng
+    padding: 10, // Khoảng cách bên trong
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+  },
+  text: {
+    fontSize: 16,
+    textAlign: 'center',
+
+  },
+  iconWithText: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  icon: {
+    width: 27,  // Kích thước của hình ảnh sao
+    height: 20,
+    marginRight: 5,  // Khoảng cách giữa icon và text
   },
 });
 
-export default ImageSlide;
+export default MyCarousel;

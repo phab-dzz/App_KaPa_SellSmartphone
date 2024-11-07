@@ -15,7 +15,7 @@ const books = [
 
 ];
 
-export default function screenrank() {
+export default function ScreenRank() {
     const navigation = useNavigation();
     return (
         <SafeAreaView style={styles.container}>
@@ -58,7 +58,7 @@ export default function screenrank() {
                 />
 
             </View>
-
+            
         </SafeAreaView>
     )
 }

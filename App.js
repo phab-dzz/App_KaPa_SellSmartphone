@@ -6,6 +6,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import MyTabs from './src/navigate/MyTabs';
 import Login from './src/screens/Login'; // Capitalize component name
 import Registration from './src/screens/Registration'; // Capitalize component name
+import CartBookItem from './src/components/CartBookItem';
 
 const Stack = createStackNavigator();
 
@@ -17,6 +18,7 @@ export default function App() {
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Registration" component={Registration} />
           <Stack.Screen name="MyTabs" component={MyTabs} options={{headerShown: false}}/>
+          <Stack.Screen name="CartBookItem" component={CartBookItem} options={{headerShown: false}}/>
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>

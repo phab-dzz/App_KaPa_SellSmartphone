@@ -14,9 +14,9 @@ import {
   TextInput,
 } from "react-native"; // Đảm bảo import 'Image'
 import Icon from 'react-native-vector-icons/FontAwesome';
-import GooglePNG from '../../assets/Wrappergg.png';
-import FacebookPNG from '../../assets/Shapefb.png';
-import TwitterPNG from '../../assets/Shapeapple.png';
+import GooglePNG from '../../assets/Login/Wrappergg.png';
+import FacebookPNG from '../../assets/Login/Shapefb.png';
+import TwitterPNG from '../../assets/Login/Shapeapple.png';
 
 const RegistrationScreen = (props ) => {
   const navigation = useNavigation();
@@ -35,13 +35,13 @@ const RegistrationScreen = (props ) => {
   return (
     <SafeAreaView style={styles.container}>
       <ImageBackground
-        source={require('../../assets/image 20bg.png')}
+        source={require('../../assets/Login/image 20bg.png')}
         style={styles.backgroundImage}
         resizeMode=""
       >
         {/* <ScrollView style={styles.scrollView}> */}
           <Image
-            source={require('../../assets/Illustrationchube.png')}
+            source={require('../../assets/Login/Illustrationchube.png')}
             style={{ top: 0, left: 0, right: 0, bottom: 0, position: 'absolute', width: 380, height: 300 }}
           />
           <View style={styles.contentContainer}>
