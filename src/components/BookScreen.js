@@ -1,5 +1,6 @@
-import React from 'react';
-import { View, Text, Image, ScrollView, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { View, Text, Image, ScrollView, FlatList, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import ZoomableView from './ZoomableView';
 import BadgeExample from './BadgeExample';
 import MySwiper from './Slide';
@@ -7,22 +8,58 @@ import ItemBook from './ItemBook';
 import Podcourse from './Podcourse';
 import BookList from './BookList';
 import BooksForYou from './BooksForYou';
+import axios from 'axios';
 
 
 import { LinearGradient } from 'expo-linear-gradient';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
-const books = [
-    { id: '1', title: 'Giao Tiếp Với Thiên Nhiên',author: 'Khang Dinh', image: require('../../img/book1.png') },
-    { id: '2', title: 'Osho: Cuộc sống & Chân lý',author: 'Khang Dinh', image: require('../../img/book2.png') },
-    { id: '3', title: 'Trải Nghiệm Khách Hàng',author: 'Khang Dinh', image: require('../../img/book3.png') },
-    { id: '4', title: 'Sức Mạnh Của Sự Tĩnh Lặng',author: 'Khang Dinh', image: require('../../img/book4.png') },
-    { id: '5', title: 'Người đàn bà trong tôi',author: 'Khang Dinh', image: require('../../img/book5.png') },
 
-];
 
 
 
 export default function BookScreen({ navigation }) {
+    const [books, setBooks] = useState([]);
+    const route = useRoute();
+    
+    const { user } = route.params;
+    const [showNotification, setShowNotification] = useState(false);
+    const [notificationPosition] = useState(new Animated.Value(0)); // Position of the notification (from right to left)
+    const [notificationOpacity] = useState(new Animated.Value(1));
+
+    const fetchBookList = async () => {
+        try {
+            const response = await axios.get('http://172.20.10.2:5000/api/v1/book/ranking');
+            setBooks(response.data);
+        } catch (error) {
+            console.error('Error fetching books:', error);
+        }
+    };
+    useEffect(() => {
+        fetchBookList();
+        
+        const timer = setTimeout(() => {
+            setShowNotification(true);
+
+            // Start the animation when notification appears
+            Animated.sequence([
+                // Slide the notification from right to left
+                Animated.timing(notificationPosition, {
+                    toValue: 1,  // Move from right to left (1 is the target position)
+                    duration: 2000, // Duration of slide animation
+                    useNativeDriver: true,
+                }),
+                Animated.timing(notificationOpacity, {
+                    toValue: 0, // Fade to invisible
+                    duration: 2000, // Duration of fade-out animation
+                    delay: 10000, // Wait until the notification has fully moved
+                    useNativeDriver: true,
+                })
+            ]).start();
+        }, 4000);
+
+        return () => clearTimeout(timer);
+    }, []);
+
     return (
         <LinearGradient
         colors={[
@@ -43,12 +80,12 @@ export default function BookScreen({ navigation }) {
 
                 <View style={styles.header}>
                     <TouchableOpacity style={styles.row}>
-                        <Image source={require("../../assets/BookScreen/logo.png")}/>
+                        <Image source={require("../../assets/BookScreen/logo.png")} style={{height: 50, width: 50}}/>
                         <Text style={styles.logo}>KaPaBooks</Text>
                      </TouchableOpacity>
                    
                     <TouchableOpacity
-                    onPress={() => navigation.navigate('Account')}
+                    onPress={() => navigation.navigate('Account', {user}) }
                     >
                         <Image style={styles.profile} source={require("../../assets/BookScreen/profile.png")}/>
                     </TouchableOpacity>
@@ -62,7 +99,7 @@ export default function BookScreen({ navigation }) {
                         <BadgeExample />
                     </View>
                     <View style={{ height: 370, marginTop: 20 }}>
-                        <MySwiper/>
+                        <MySwiper user={user}/>
                     </View>
 
                     {/* <View style={{ height: 250, marginTop: 20 }}>
@@ -100,7 +137,7 @@ export default function BookScreen({ navigation }) {
                         <TouchableOpacity
                             style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}
 
-                            onPress={() => navigation.navigate('rank')}
+                            onPress={() => navigation.navigate('rank', { user })}
                         >
                             {/* <Image source={{uri: 'https://img.icons8.com/ios/452/reading.png'}} style={{ width: 24, height: 24 }} /> */}
 
@@ -115,14 +152,14 @@ export default function BookScreen({ navigation }) {
                             data={books}
                             keyExtractor={(item) => item.id}
                             renderItem={({ item, index }) => (
-                                <TouchableOpacity style={styles.popularBookCard}
-                                    onPress={() => navigation.navigate('CartBookItem', { book: item })}
+                                <TouchableOpacity
+                                    style={styles.popularBookCard}
+                                    onPress={() => navigation.navigate('CartBookItem', { book: item, user })}
                                 >
                                     <View style={styles.bookNumberContainer}>
                                         <Text style={styles.bookNumberText}>{index + 1}</Text>
                                     </View>
-                                    <Image source={item.image} style={styles.popularBookImage} />
-                                    {/* <Text style={styles.popularBookTitle}>{item.title}</Text> */}
+                                    <Image source={{ uri: item.imgsrc }} style={styles.popularBookImage} />
                                 </TouchableOpacity>
                             )}
                             showsHorizontalScrollIndicator={false}
@@ -148,20 +185,22 @@ export default function BookScreen({ navigation }) {
                     <View style={{ marginTop: 40, paddingLeft: 16, }}>
                         <TouchableOpacity
                         style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}
-                        // onPress={() => navigation.navigate("")}
+                        onPress={() => navigation.navigate("BookListScreenAll", { title: "Mới xuất bản" }, { user })}
+                        
                         >
                             <Text style={styles.sectionTitle}>Mới xuất bản</Text>
                            
                             <Ionicons name="chevron-forward" size={24} color="black" />
                         </TouchableOpacity>
                         
-                        <BookList />
+                        <BookList user={user} />
                        
 
                     </View>
                     <View>
                         <TouchableOpacity
-                         onPress={() => navigation.navigate('rank')}
+                         onPress={() => navigation.navigate('rank', { user: user })}
+
                         >
 
                         <Image source={require('../../assets/BookScreen/top20.png')} style={styles.imageTop20} />
@@ -179,20 +218,52 @@ export default function BookScreen({ navigation }) {
                     <View style={{ marginTop: 40, paddingLeft: 16, paddingBottom: 100 }}>
                         <TouchableOpacity
                         style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}
-                        // onPress={() => navigation.navigate("")}
+                        onPress={() => navigation.navigate("BookListScreenAll", { title: "Dành riêng cho bạn" })}
                         >
                             <Text style={styles.sectionTitle}>Dành riêng cho bạn</Text>
                             <Image source={require("../../assets/BookScreen/heartmini.png")} style={{ width: 20, height: 20, marginLeft: -80 }} />
                             <Ionicons name="chevron-forward" size={24} color="black" />
                         </TouchableOpacity>
                         
-                        <BooksForYou />
+                        <BooksForYou user={user}/>
                        
 
                     </View>
 
                     
                 </ScrollView>
+                {showNotification && (
+                    <Animated.View
+                        style={[
+                            styles.notification,
+                            {
+                                transform: [
+                                    {
+                                        translateX: notificationPosition.interpolate({
+                                            inputRange: [0, 1],
+                                            outputRange: [400, 0], // Start from right (400) to center (0)
+                                        }),
+                                    },
+                                ],
+                                opacity: notificationOpacity, // Apply fading effect
+                            },
+                        ]}
+                    >
+                        <Text style={styles.notificationText}>
+                            Chat với tư vấn viên AI của chúng tôi
+                        </Text>
+                    </Animated.View>
+                )}
+
+                {/* ChatBot Floating Button */}
+                <TouchableOpacity
+                    style={styles.floatingButton}
+                    onPress={() => navigation.navigate('ChatBot')}
+                >
+                    {/* <Ionicons name="chatbubble-ellipses-outline" size={30} color="white" /> */}
+                    <Image source={require("../../assets/BookScreen/chatbot.png")} style={{ width: 53, height: 53 }} />
+                </TouchableOpacity>
+         
             </View>
         </LinearGradient>
     );
@@ -231,8 +302,8 @@ const styles = StyleSheet.create({
 
     },
     profile: {
-        height: 40,
-        width: 40,
+        height: 60,
+        width: 60,
         borderRadius: 14,
         padding: 10,
     },
@@ -391,5 +462,32 @@ const styles = StyleSheet.create({
         color: 'white',
         marginBottom: 10,
     },
-
+    notification: {
+        position: 'absolute',
+        bottom: 95,
+        right: 83,
+        backgroundColor: '#007280',
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        borderRadius: 8,
+        zIndex: 2, 
+    },
+    notificationText: {
+        color: 'white',
+        fontSize: 13,
+        fontWeight: 'bold',
+    },
+    
+    floatingButton: {
+        position: 'absolute',
+        bottom: 90,
+        right: 20,
+        backgroundColor: '#007280',
+        borderRadius: 50,
+        width: 60,
+        height: 60,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 5,
+    },
 });

@@ -1,71 +1,134 @@
-import React from 'react'
-import { View, Text, Animated, TouchableWithoutFeedback, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import React, { Component } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { FontAwesome, Ionicons } from '@expo/vector-icons';
-import { styleProps } from 'react-native-web/dist/cjs/modules/forwardedProps';
-import { useNavigation } from '@react-navigation/native';
-import { FlatList } from 'react-native-gesture-handler';
+import { Ionicons } from '@expo/vector-icons';
+import axios from 'axios';
 import ItemBookrank from './ItemBookrank';
-const books = [
-    { id: '1', title: 'Giao Tiếp Với Thiên Nhiên', image: require('../../img/book1.png') },
-    { id: '2', title: 'Osho: Cuộc sống & Chân lý', image: require('../../img/book2.png') },
-    { id: '3', title: 'Trải Nghiệm Khách Hàng', image: require('../../img/book3.png') },
-    { id: '4', title: 'Sức Mạnh Của Sự Tĩnh Lặng', image: require('../../img/book4.png') },
-    { id: '5', title: 'Người đàn bà trong tôi', image: require('../../img/book5.png') },
 
-];
+export default class ScreenRank extends Component {
+    
+    constructor(props) {
+        super(props);
+        const { user } = props.route.params;
+        this.state = {
+            books: [],
+            loading: true,
+            error: null,
+            user: user,
 
-export default function ScreenRank() {
-    const navigation = useNavigation();
-    return (
-        <SafeAreaView style={styles.container}>
-            <View style={{ flex: 20, gap: 10, paddingLeft: 15 }}>
-                <TouchableOpacity
-                    style={{
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderWidth: 1,
-                        backgroundColor: 'gray',
-                        borderRadius: 50,
-                        marginTop: 15,
-                        width: 30,
-                        height: 30,
-                    }}
-                    onPress={() => navigation.goBack()}
-                >
-                    <Ionicons name="chevron-back" size={24} color="#fff" />
-                </TouchableOpacity>
-                <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#fff' }}>Bảng xếp hạng</Text>
-                <Text style={{ fontSize: 26, fontWeight: 'bold', color: '#fff' }}>Top sách nói thịnh hành</Text>
+        };
+    }
 
-            </View>
-            <View style={{
-                flex: 60, backgroundColor: '#fff', borderTopLeftRadius: 20,
-                borderTopRightRadius: 20
-            }}>
-                <FlatList
-                    data={books}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity style={{ marginTop: 25 }}>
-                            <ItemBookrank url={item.image} title={item.title} />
-                        </TouchableOpacity>
-                    )}
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{
-                        justifyContent: 'center', alignItems: 'center',
-                    }}
-                />
+    // Hàm fetch danh sách sách từ API
+    fetchBookList = async () => {
+        try {
+            const response = await axios.get('http://172.20.10.2:5000/api/v1/book/ranking');
+            this.setState({ books: response.data, loading: false });
+        } catch (error) {
+            console.error('Error fetching books:', error);
+            this.setState({ error: 'Failed to fetch books.', loading: false });
+        }
+    };
 
-            </View>
-            
-        </SafeAreaView>
-    )
+    componentDidMount() {
+        this.fetchBookList();
+    }
+
+    render() {
+        const { books, loading, error, user } = this.state;
+        const { navigation } = this.props;
+        console.log('User in CartBookItem:', user);
+
+        return (
+            <SafeAreaView style={styles.container}>
+                {/* Header */}
+                 
+                <View style={{ gap: 10, paddingLeft: 0, paddingBottom: 20, paddingTop:17 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', paddingBottom: 14, paddingLeft: 20 }}>
+                    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerbox}>
+                                <Ionicons name="chevron-back-outline" size={24} color="#fff" />
+                            </TouchableOpacity>
+                    <Text style={styles.headerTitle}>Bảng xếp hạng</Text>
+                    </View>
+                    <Text style={styles.headerSubtitle}>Top sách nói thịnh hành</Text>
+                </View>
+                <ScrollView contentContainerStyle={styles.scrollViewContent}>
+                {/* Nội dung */}
+                 <View style={styles.content}>
+                        {loading ? (
+                            <Text style={styles.loadingText}>Đang tải...</Text>
+                        ) : error ? (
+                            <Text style={styles.errorText}>{error}</Text>
+                        ) : (
+                            books.map((item, index) => (
+                                <TouchableOpacity key={item.id} style={{ marginTop: 25 }}
+                                onPress={() => navigation.navigate('CartBookItem', { book: item, user })}
+                                >
+                                    <ItemBookrank
+                                        url={item.imgsrc}
+                                        title={item.name}
+                                        author={item.author}
+                                        rank={index + 1}
+                                    />
+                                </TouchableOpacity>
+                            ))
+                        )}
+                    </View>
+                </ScrollView>
+            </SafeAreaView>
+        );
+    }
 }
+
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#b6b7f7'
+        backgroundColor: '#b6b7f7',
     },
-})
+    headerbox: {
+        width: 35,
+        height: 35,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 50,
+        backgroundColor: '#878787',
+        //thêm độ trong suất cho background
+        opacity: 0.8,
 
+    },
+    headerTitle: {
+        paddingLeft: 19,
+        paddingTop: 0,
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#fff',
+    },
+    headerSubtitle: {
+        paddingLeft: 20,
+        fontSize: 26,
+        fontWeight: 'bold',
+        color: '#fff',
+    },
+    content: {
+        paddingBottom: 200,
+        backgroundColor: '#fff',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+    },
+    loadingText: {
+        marginTop: 20,
+        textAlign: 'center',
+        fontSize: 16,
+        color: '#666',
+    },
+    errorText: {
+        marginTop: 20,
+        textAlign: 'center',
+        fontSize: 16,
+        color: '#ff0000',
+    },
+    scrollViewContent: {
+        paddingTop: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+});

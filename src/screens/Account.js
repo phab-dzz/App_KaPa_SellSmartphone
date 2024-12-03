@@ -1,18 +1,21 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import Login from './Login';
 
 export default function AccountScreen() {
     const navigation = useNavigation();
+    const route = useRoute();
+    
+    const { user } = route.params;
     return (
         <View style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerbox}>
-                        <Ionicons name="chevron-back-outline" size={24} color="#fff" />
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerbox}>
+                    <Ionicons name="chevron-back-outline" size={24} color="#fff" />
                 </TouchableOpacity>
-                
             </View>
 
             {/* User Info */}
@@ -20,7 +23,7 @@ export default function AccountScreen() {
                 <View style={styles.avatarContainer}>
                     <Image source={ require('../../assets/BookScreen/profile.png')} style={styles.avatar} />
                 </View>
-                <Text style={styles.userName}>Khang Đình</Text>
+                <Text style={styles.userName}>{user.name}</Text>
                 <Text style={styles.userInfoText}>Thông tin cá nhân </Text>
             </View>
 
@@ -31,7 +34,9 @@ export default function AccountScreen() {
                 <MenuItem icon="info-circle" text="Về chúng tôi" />
                 <MenuItem icon="question-circle" text="Hỗ trợ" />
                 <MenuItem icon="cog" text="Cài đặt" />
-                <TouchableOpacity style={styles.logoutButton}>
+                <TouchableOpacity 
+                    onPress={() => navigation.navigate('Login')}
+                    style={styles.logoutButton}>
                     <Text style={styles.logoutText}>Đăng xuất</Text>
                 </TouchableOpacity>
             </View>
@@ -64,9 +69,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 50,
         backgroundColor: '#878787',
-        //thêm độ trong suất cho background
         opacity: 0.8,
-
     },
     userInfoContainer: {
         alignItems: 'center',
@@ -76,13 +79,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#eee',
         borderRadius: 100,
         padding: 5,
-        
     },
     avatar: {
         width: 130,
         height: 130,
         borderRadius: 100,
-    
     },
     userName: {
         fontSize: 24,

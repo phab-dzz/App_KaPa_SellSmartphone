@@ -7,15 +7,24 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import Slider from '@react-native-community/slider';
 import { LinearGradient } from 'expo-linear-gradient';
 import Fontisto from '@expo/vector-icons/Fontisto';
+import HeartIcon from '../../assets/components/Heart';
+import Entypo from '@expo/vector-icons/Entypo';
+import BookList from './BookList';
+import BookListScreenAll from './BookListScreenAll';
 import { Audio } from 'expo-av';
 export default (props) => {
 	const navigation = useNavigation();
 	const route = useRoute();
-    const { book } = route.params; 
+    const { book, user } = route.params; 
+	const chapters = book.chapter ? JSON.parse(book.chapter) : [];
+	const [showAll, setShowAll] = useState(false);
+	const displayedChapters = showAll ? chapters : chapters.slice(0, 3);
+
 	const [bookInfo, setBookInfo] = useState({
-		title: book.title,      // Lưu tên sách
+		id : book.id,          // Lưu id sách
+		title: book.name,      // Lưu tên sách
 		author: book.author,    // Lưu tác giả sách
-		image: book.image,      // Lưu ảnh sách
+		image: book.imgsrc,      // Lưu ảnh sách
 	  });
 	return (
 		<LinearGradient
@@ -36,10 +45,11 @@ export default (props) => {
 						<View style={styles.row}>
                             <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerbox}>
                                 <Ionicons name="chevron-back-outline" size={24} color="#fff" />
+								
                             </TouchableOpacity>
 							<View style={styles.boxImg}>
 								<Image
-									source = {bookInfo.image} 
+									source = {{ uri: bookInfo.image }}
 									
 									style={styles.imageBook}
 								/>
@@ -52,11 +62,11 @@ export default (props) => {
 							</TouchableOpacity>
 						</View>
 						<Text style={styles.text}>
-							{"Tuổi trẻ đáng giá bao nhiêu?"}
+							{bookInfo.title}
 						</Text>
 						<View style={styles.row2}>
 							<Text style={styles.textAuthor}>
-								{"Rosie Nguyễn"}
+								{bookInfo.author}
 							</Text>
 							<AntDesign name="right" size={12} color="white" />
 						</View>
@@ -69,19 +79,21 @@ export default (props) => {
 						<View style={styles.column3}>
 							<View style={styles.view3}>
 								<View style={styles.viewHeart}>
-									<AntDesign name="hearto" size={18} color="white" />
+								<HeartIcon userId={user.id} bookId={bookInfo.id} />
 								</View>
+								<TouchableOpacity
+									onPress={() => navigation.navigate('AudioBook', { book: book })}
+									>
 								<View style={styles.row4}>
 									<FontAwesome name="play" size={18} color="white" style={{paddingRight: 10}}/>
-									<TouchableOpacity
-									onPress={() => navigation.navigate('AudioBook', { book: bookInfo })}
-									>
+									
 									<Text style={styles.text4}>
 										{"Nghe chương đầu miễn phí"}
 									</Text>
-									</TouchableOpacity>
+									
 									
 								</View>
+								</TouchableOpacity>
 							</View>
 							
 						</View>
@@ -171,33 +183,31 @@ export default (props) => {
 						</View>
 						
 					</View>
+					
 					<View style={{backgroundColor: '#F3F8FC', borderRadius: 10, padding: 5, marginTop: 0, paddingTop: 40, paddingBottom: 0}}>
 						<Text style={styles.text16}>
 								{"Giới thiệu nội dung"}
 						</Text>
 						<Text style={styles.absoluteText}>
-							{"Tuổi trẻ có ý nghĩa như thế nào? chia sẻ những câu chuyện quen thuộc mà tất cả mọi người trải qua khi trẻ, như một bài học từ những người đi trước dành cho giới trẻ. Tác giả Rosie Nguyễn kể về những sự kiện thực tế mà cô đã trải qua và đưa ra quan điểm cá nhân về nhiều vấn đề, đặc biệt là về sách.\n"}
+							{book.description}
 						</Text>
 					
 					
 					
-					<View style={styles.row10}>
-						<Text style={styles.text17}>
-							{"Xem thêm"}
-						</Text>
-						<Image
-							source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image11}
-						/>
-					</View>
+					
+						<TouchableOpacity>
+							<View style={styles.row10}>
+								<Text style={styles.text17}>
+									{"Xem thêm"}
+								</Text>
+								<AntDesign name="down" size={15} color="black" />
+							</View>
+						</TouchableOpacity>
+						
+					
 					
 					<View style={styles.row11}>
-						<Image
-							source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image12}
-						/>
+						<AntDesign name="clockcircleo" size={17} style={{marginRight: 2}} color="black" />
 						<Text style={styles.text18}>
 							{"3 giờ"}
 						</Text>
@@ -208,23 +218,19 @@ export default (props) => {
 				</Text>
 				<View style={styles.row12}>
 					<Image
-						source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
+						source = {{ uri: bookInfo.image }}
 						resizeMode = {"stretch"}
 						style={styles.image13}
 					/>
 					<View style={styles.column8}>
 						<View style={styles.row13}>
-							<Image
-								source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-								resizeMode = {"stretch"}
-								style={styles.image12}
-							/>
+							<Fontisto name="star" size={18} color="#fdbb2d" />
 							<Text style={styles.text20}>
 								{"4.4/5.0"}
 							</Text>
 						</View>
 						<Text style={styles.text21}>
-							{"Từ 13 đánh giá"}
+							{"Từ"} {book.rating}
 						</Text>
 					</View>
 				</View>
@@ -253,31 +259,11 @@ export default (props) => {
 						{"Khang Đinh"}
 					</Text>
 					<View style={styles.row15}>
-						<Image
-							source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image14}
-						/>
-						<Image
-							source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image14}
-						/>
-						<Image
-							source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image14}
-						/>
-						<Image
-							source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image14}
-						/>
-						<Image
-							source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image15}
-						/>
+						<Fontisto name="star" size={15} color="#fdbb2d" style={{marginRight: 2}}/>
+						<Fontisto name="star" size={15} color="#fdbb2d" style={{marginRight: 2}}/>
+						<Fontisto name="star" size={15} color="#fdbb2d" style={{marginRight: 2}}/>
+						<Fontisto name="star" size={15} color="#fdbb2d" style={{marginRight: 2}}/>
+						<Fontisto name="star" size={15} color="#fdbb2d" style={{marginRight: 2}}/>
 					</View>
 					<Text style={styles.text25}>
 						{"Rất hay"}
@@ -295,11 +281,7 @@ export default (props) => {
 					</View>
 					<View style={styles.row17}>
 						<View style={styles.view7}>
-							<Image
-								source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-								resizeMode = {"stretch"}
-								style={styles.image16}
-							/>
+						<AntDesign name="like2" size={15} color="black" />
 						</View>
 						<Text style={styles.text29}>
 							{"2 ngày trước"}
@@ -311,31 +293,11 @@ export default (props) => {
 						{"Khang Đinh"}
 					</Text>
 					<View style={styles.row15}>
-						<Image
-							source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image14}
-						/>
-						<Image
-							source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image14}
-						/>
-						<Image
-							source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image14}
-						/>
-						<Image
-							source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image14}
-						/>
-						<Image
-							source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image15}
-						/>
+					<Fontisto name="star" size={15} color="#fdbb2d" style={{marginRight: 2}}/>
+						<Fontisto name="star" size={15} color="#fdbb2d" style={{marginRight: 2}}/>
+						<Fontisto name="star" size={15} color="#fdbb2d" style={{marginRight: 2}}/>
+						<Fontisto name="star" size={15} color="#fdbb2d" style={{marginRight: 2}}/>
+						<Fontisto name="star" size={15} color="#fdbb2d" style={{marginRight: 2}}/>
 					</View>
 					<Text style={styles.text25}>
 						{"Rất hay"}
@@ -353,131 +315,77 @@ export default (props) => {
 					</View>
 					<View style={styles.row17}>
 						<View style={styles.view7}>
-							<Image
-								source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-								resizeMode = {"stretch"}
-								style={styles.image16}
-							/>
+							<AntDesign name="like2" size={15} color="black" />
 						</View>
 						<Text style={styles.text29}>
 							{"2 ngày trước"}
 						</Text>
 					</View>
 				</View>
-				<View style={styles.view8}>
-					<Text style={styles.text30}>
-						{"Xem tất cả 6 đánh giá >"}
-					</Text>
-				</View>
+				<TouchableOpacity>
+					<View style={styles.view8}>
+						<Text style={styles.text30}>
+							{"Xem tất cả 6 đánh giá >"}
+						</Text>
+					</View>
+				</TouchableOpacity>
+				
 				<View style={styles.box3}>
 				</View>
-				<Text style={styles.text31}>
-					{"Mục lục"}
-				</Text>
-				<Text style={styles.text32}>
-					{"MỄN PHÍ CHƯƠNG I"}
-				</Text>
-				<View style={styles.row18}>
-					<Text style={styles.text33}>
-						{"Chương I: Tôi đã học như thế nào?"}
-					</Text>
-					<View style={styles.view9}>
-						<Image
-							source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image17}
-						/>
+				<View style={styles.contentContainer}>
+				<View style={styles.container}>
+				<Text style={styles.text31}>{"Mục lục"}</Text>
+				<Text style={styles.text32}>{"MIỄN PHÍ CHƯƠNG I"}</Text>
+
+				{displayedChapters.map((chapter, index) => (
+					<View key={index}>
+					<View style={styles.row18}>
+						<Text style={styles.text33}>{chapter.title}</Text>
+						<TouchableOpacity
+						onPress={() => navigation.navigate('AudioBook', { book: book, chapter })}
+						>
+						<View style={styles.view9}>
+							<Entypo name="controller-play" size={24} color="white" />
+						</View>
+						</TouchableOpacity>
 					</View>
-				</View>
-				<Text style={styles.text34}>
-					{"50 phút"}
-				</Text>
-				<View style={styles.row18}>
-					<Text style={styles.text33}>
-						{"Chương II: Học đi đôi với hành"}
-					</Text>
-					<View style={styles.view9}>
-						<Image
-							source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image17}
-						/>
+					<Text style={styles.text34}>{chapter.description}</Text>
 					</View>
-				</View>
-				<Text style={styles.text35}>
-					{"50 phút"}
-				</Text>
-				<View style={styles.row19}>
+				))}
+
+				<TouchableOpacity onPress={() => setShowAll(!showAll)}>
+					<View style={styles.row19}>
 					<Text style={styles.text36}>
-						{"Xém tất cả 5 chương"}
+						{showAll ? "Thu gọn" : `Xem tất cả ${chapters.length} chương`}
 					</Text>
-					<Image
-						source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-						resizeMode = {"stretch"}
-						style={styles.image11}
+					<AntDesign
+						name={showAll ? "up" : "down"}
+						size={15}
+						color="#EF9D83"
 					/>
+					</View>
+				</TouchableOpacity>
 				</View>
+
+				<View style={styles.box3}></View>
 				<View style={styles.column11}>
+					<TouchableOpacity
+					 onPress={() => navigation.navigate('BookListScreenAll', { title: 'Sách tương tự' })}
+					>
 					<View style={styles.row20}>
 						<Text style={styles.text37}>
 							{"Sách tương tự"}
 						</Text>
-						<Image
-							source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image18}
-						/>
+						<AntDesign name="right" size={20} color="black" style={{marginRight: 5}} />
+						
 					</View>
-					<Image
-						source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-						resizeMode = {"stretch"}
-						style={styles.image19}
-					/>
-					<Image
-						source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-						resizeMode = {"stretch"}
-						style={styles.image20}
-					/>
-					<Image
-						source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-						resizeMode = {"stretch"}
-						style={styles.image21}
-					/>
-					<View style={styles.box4}>
-					</View>
+					</TouchableOpacity>
+					
+					<BookList/>
 				</View>
-				<View style={styles.column12}>
-					<View style={styles.row21}>
-						<Image
-							source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image22}
-						/>
-						<View style={styles.box}>
-						</View>
-						<Image
-							source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image23}
-						/>
-						<Image
-							source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image24}
-						/>
-						<Image
-							source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image25}
-						/>
-					</View>
-					<Image
-						source = {{uri: "https://i.imgur.com/1tMFzp8.png"}} 
-						resizeMode = {"stretch"}
-						style={styles.image26}
-					/>
 				</View>
 			</ScrollView>
+			
 		</SafeAreaView>
 		</LinearGradient>
 	)
@@ -515,6 +423,12 @@ const styles = StyleSheet.create({
 		backgroundColor: "#00000000",
 		paddingHorizontal: 21,
 	},
+	contentContainer: {
+		backgroundColor: '#fff', // Nền trắng
+		paddingVertical: 20,      // Khoảng cách trên dưới cho nội dung
+		borderTopLeftRadius: 10,  // Bo góc trên trái (tùy chọn)
+		borderTopRightRadius: 10, // Bo góc trên phải (tùy chọn)
+	  },
 	absoluteText: {
 		
 		color: "#919BAE",
@@ -523,6 +437,7 @@ const styles = StyleSheet.create({
 		fontWeight: "bold",
 		width: 'auto',
 		paddingHorizontal: 21,
+		paddingBottom: 10,
 
 	},
 	absoluteView: {
@@ -586,7 +501,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	column8: {
-		width: 275,
+		width: 260,
 		backgroundColor: "#FFFFFF",
 		borderRadius: 10,
 		paddingVertical: 35,
@@ -699,9 +614,9 @@ const styles = StyleSheet.create({
 		marginRight: 10,
 	},
 	image13: {
-		borderRadius: 15,
-		width: 75,
-		height: 110,
+		borderRadius: 8,
+		width: 90,
+		height: 120,
 	},
 	image14: {
 		width: 11,
@@ -896,7 +811,7 @@ const styles = StyleSheet.create({
 	},
 	row20: {
 		width: 390,
-		height: 56,
+		height: 'auto',
 		flexDirection: "row",
 		justifyContent: "space-between",
 		alignItems: "center",
@@ -918,7 +833,10 @@ const styles = StyleSheet.create({
 		fontSize: 19,
 		fontWeight: "bold",
 		marginBottom: 16,
-		marginLeft: 61,
+		paddingHorizontal: 20,
+		textAlign: "center",
+		alignItems: "center",
+		width: "100%",
 	},
 	textAuthor: {
 		color: "#ffff",
@@ -1028,6 +946,7 @@ const styles = StyleSheet.create({
 		marginLeft: 16,
 	},
 	text20: {
+		marginLeft: 5,
 		color: "#000000",
 		fontSize: 20,
 		fontWeight: "bold",
@@ -1035,7 +954,7 @@ const styles = StyleSheet.create({
 	},
 	text21: {
 		color: "#868686",
-		fontSize: 14,
+		fontSize: 12,
 		fontWeight: "bold",
 	},
 	text22: {
@@ -1046,7 +965,7 @@ const styles = StyleSheet.create({
 	},
 	text23: {
 		color: "#868686",
-		fontSize: 14,
+		fontSize: 13,
 		fontWeight: "bold",
 		marginLeft: 5,
 	},
@@ -1102,11 +1021,13 @@ const styles = StyleSheet.create({
 		marginLeft: 26,
 	},
 	text33: {
+		width: 290,
 		color: "#000000",
 		fontSize: 15,
 		fontWeight: "bold",
 	},
 	text34: {
+		width: 302,
 		color: "#868686",
 		fontSize: 13,
 		marginBottom: 22,
@@ -1149,14 +1070,13 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 4,
 		marginHorizontal: 14,
 	},
-	viewHeart: {
-		backgroundColor: "#00000000",
-		padding: 5,
-		borderRadius: 25,
-		borderWidth: 1,
-		borderColor: "#fff",
-		marginRight: 10,
-	},
+	// viewHeart: {
+	// 	padding: 5,
+	// 	borderRadius: 25,
+	// 	borderWidth: 1,
+	// 	borderColor: "#fff",
+	// 	marginRight: 10,
+	// },
 	view5: {
 		backgroundColor: "#FEF6E9",
 		borderRadius: 10,
@@ -1168,7 +1088,7 @@ const styles = StyleSheet.create({
 		marginTop: 153,
 	},
 	view7: {
-		width: 25,
+		width: 'auto',
 		backgroundColor: "#FFFFFF",
 		borderColor: "#D9D9D9",
 		borderRadius: 15,

@@ -1,21 +1,46 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import React, { useState, useEffect }  from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import ItemBookrank from '../components/ItemBook';
-
-const books = [
-    { id: '1', title: 'Giao Tiếp Với Thiên Nhiên',author: 'Khang Dinh', image: require('../../img/book1.png') },
-    { id: '2', title: 'Osho: Cuộc sống & Chân lý',author: 'Khang Dinh', image: require('../../img/book2.png') },
-    { id: '3', title: 'Trải Nghiệm Khách Hàng',author: 'Khang Dinh', image: require('../../img/book3.png') },
-    { id: '4', title: 'Sức Mạnh Của Sự Tĩnh Lặng',author: 'Khang Dinh', image: require('../../img/book4.png') },
-    { id: '5', title: 'Người đàn bà trong tôi',author: 'Khang Dinh', image: require('../../img/book5.png') },
-
-];
+import { useNavigation, useRoute } from '@react-navigation/native';
+import ItemBook from '../components/ItemBook';
+import axios from 'axios';
 
 export default function LibraryScreen() {
+    const [books, setBooks] = useState([]);
     const navigation = useNavigation();
+    const route = useRoute();
+    
+    const { user } = route.params;
+
+    const fetchBookList = async () => {
+        if (!user?.id) {
+            console.error('User ID is missing.');
+            return;
+        }
+        try {
+            const response = await axios.get(`http://172.20.10.2:5000/api/v1/userbook/userId?userId=${user.id}`);
+            const transformedBooks = response.data.map(item => ({
+                name: item['book.name'],
+                author: item['book.author'],
+                rating: item['book.rating'],
+                description: item['book.description'],
+                genre: item['book.genre'],
+                durating: item['book.durating'],
+                imgsrc: item['book.imgsrc'],
+                audioSrc: item['book.audioSrc'],
+                chapter: JSON.parse(item['book.chapter']),
+                numericRating: null // Bạn có thể tính toán numericRating nếu cần
+            }));
+            setBooks(transformedBooks);
+        } catch (error) {
+            console.error('Error fetching books:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchBookList();
+    }, []);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -31,39 +56,41 @@ export default function LibraryScreen() {
             
 
             {/* Book List */}
+            <ScrollView>
             <View style={styles.bookListContainer}>
-            <View style={styles.filterSortRow}>
+                <View style={styles.filterSortRow}>
                 <Text style={styles.filterText}>Tất cả ({books.length})</Text>
                 <TouchableOpacity>
                     <Text style={styles.sortText}>Sắp xếp</Text>
                 </TouchableOpacity>
+                </View>
+
+                {books.map((item) => (
+                <TouchableOpacity 
+                    key={item.id}
+                    onPress={() => navigation.navigate('AudioBook', { book: item })}
+                    style={styles.bookItem}
+                >
+                    <ItemBook url={item.imgsrc} title={item.name} author={item.author} />
+                </TouchableOpacity>
+                ))}
             </View>
-                <FlatList
-                    data={books}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity 
-                        onPress={() => navigation.navigate('AudioBook', { book: item })}
-                        style={styles.bookItem}>
-                            <ItemBookrank url={item.image} title={item.title} author={item.author} />
-                        </TouchableOpacity>
-                    )}
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={styles.flatListContent}
-                />
-            </View>
+            </ScrollView>
+
         </SafeAreaView>
+        
     );
 }
 
 const styles = StyleSheet.create({
     container: {
+        backgroundColor: '#b6b7f7',
         flex: 1,
-        backgroundColor: '#b6b7f7'
     },
     header: {
-        flex: 20,
+        flexDirection: 'row',
         paddingLeft: 15,
+        paddingTop: 15,
     },
     headerbox: {
         width: 35,
@@ -77,7 +104,10 @@ const styles = StyleSheet.create({
 
     },
     headerText: {
-        padding: 10,
+        paddingLeft: 20,
+        paddingTop: 5,
+        paddingBottom: 15,
+        marginBottom: 10,
         fontSize: 24,
         fontWeight: 'bold',
         color: '#fff',
@@ -88,7 +118,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 15,
-        paddingVertical: 10,
+        paddingTop: 10,
     },
     filterText: {
         fontSize: 16,
@@ -100,16 +130,20 @@ const styles = StyleSheet.create({
         color: '#4a90e2',
     },
     bookListContainer: {
-        flex: 80,
+        marginTop: 30,
+        paddingBottom: 500,
+        flex: 1,
         backgroundColor: '#fff',
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
+        bottom: 0,
     },
     bookItem: {
-        marginTop: 25,
+        marginTop: 20,
     },
     flatListContent: {
         justifyContent: 'center',
         alignItems: 'center',
+        
     },
 });

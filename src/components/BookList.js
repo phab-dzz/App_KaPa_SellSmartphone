@@ -1,23 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
 
-const books = [
-    { id: '1', title: 'Vượt Lên Trật Tự: 12 Quy Tắc Cho Cuộc Sống', author: 'Jordan B. Peterson', image: require('../../assets/BookList/book1.png') },
-    { id: '2', title: 'Anne Tóc Đỏ Dưới Mái Nhà Bạch Dương', author: 'Lucy Maud Montgomery', image: require('../../assets/BookList/book2.png') },
-    { id: '3', title: 'Tư Duy Đặt Cược: Quyết Định Sáng Suốt', author: 'Annie Duke', image: require('../../assets/BookList/book3.png') },
-    { id: '4', title: 'Ngủ Lâu Giữa Đám Người', author: 'Sachi Luwis', image: require('../../assets/BookList/book4.png') },
-    { id: '5', title: 'Phật Tâm', author: 'Nhã Nam', image: require('../../assets/BookList/book5.png') },
-    { id: '6', title: 'Câu Chuyện Feynman', author: 'Đinh Hữu', image: require('../../assets/BookList/book1.png') },
-    { id: '7', title: 'Vượt Lên Trật Tự: 12 Quy Tắc Cho Cuộc Sống', author: 'Jordan B. Peterson', image: require('../../assets/BookList/book1.png') },
-    { id: '8', title: 'Anne Tóc Đỏ Dưới Mái Nhà Bạch Dương', author: 'Lucy Maud Montgomery', image: require('../../assets/BookList/book2.png') },
-    { id: '9', title: 'Tư Duy Đặt Cược: Quyết Định Sáng Suốt', author: 'Annie Duke', image: require('../../assets/BookList/book3.png') },
-    { id: '10', title: 'Ngủ Lâu Giữa Đám Người', author: 'Sachi Luwis', image: require('../../assets/BookList/book4.png') },
-    { id: '11', title: 'Phật Tâm', author: 'Nhã Nam', image: require('../../assets/BookList/book5.png') },
-    { id: '12', title: 'Câu Chuyện Feynman', author: 'Đinh Hữu', image: require('../../assets/BookList/book1.png') },
-    // Thêm nhiều sách nếu cần
-];
-
-// Hàm chia dữ liệu thành các nhóm 3 mục
+// Hàm chia dữ liệu thành các nhóm
 const chunkArray = (array, size) => {
     return array.reduce((acc, _, index) => {
         if (index % size === 0) acc.push(array.slice(index, index + size));
@@ -25,19 +11,41 @@ const chunkArray = (array, size) => {
     }, []);
 };
 
-const BookList = () => {
+const BookList = ({user}) => {
+    const [books, setBooks] = useState([]);
+    
+    const navigation = useNavigation();
+
+    const fetchBookList = async () => {
+        try {
+            const response = await axios.get('http://172.20.10.2:5000/api/v1/book/all');
+            setBooks(response.data);
+        } catch (error) {
+            console.error('Error fetching books:', error);
+        }
+    };
     const bookRows = chunkArray(books, 3);
+
+    useEffect(() => {
+        fetchBookList();
+    }, []);
 
     const renderRow = ({ item }) => (
         <View style={styles.row}>
             {item.map((book) => (
-                <TouchableOpacity key={book.id} style={styles.bookCard}>
-                    <Image source={book.image} style={styles.bookImage} />
+                <TouchableOpacity
+                    key={book.id}
+                    style={styles.bookCard}
+                    onPress={() => navigation.navigate('CartBookItem', { book, user })}
+                >
+                    <Image
+                        source={{ uri: book.imgsrc }}
+                        style={styles.bookImage}
+                    />
                     <View style={styles.bookInfo}>
-                        <View style={styles.tag}>
-                            <Text style={styles.tagText} >1 THẺ KAPA</Text>
-                        </View>
-                        <Text style={styles.bookTitle} numberOfLines={2}>{book.title}</Text>
+                        <Text style={styles.bookTitle} numberOfLines={2}>
+                            {book.name}
+                        </Text>
                         <Text style={styles.bookAuthor}>{book.author}</Text>
                     </View>
                     <TouchableOpacity style={styles.moreButton}>
@@ -50,10 +58,10 @@ const BookList = () => {
 
     return (
         <FlatList
-            horizontal
-            data={bookRows}
             keyExtractor={(item, index) => index.toString()}
+            data={bookRows}
             renderItem={renderRow}
+            horizontal // Hiển thị ngang
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.flatList}
         />

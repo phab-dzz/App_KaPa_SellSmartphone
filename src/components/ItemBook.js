@@ -14,7 +14,7 @@ function ItemBook({ url, title, author, textbook }) {
             borderRadius: 20,
         }}>
             <View style={{ height: '80%', width: '30%' }}>
-                <Image source={url} style={{ width: 100, height: 150, borderRadius: 10 }} />
+                <Image source={{ uri: url }} style={{ width: 100, height: 150, borderRadius: 10 }} />
             </View>
             <View style={{ justifyContent: 'flex-start', height: '80%', width: '50%' }}>
                 <Text numberOfLines={3} style={{ fontSize: 20, fontWeight: 'bold', paddingTop: 15 }}>{title}</Text>

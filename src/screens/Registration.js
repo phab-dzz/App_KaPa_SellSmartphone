@@ -17,9 +17,11 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import GooglePNG from '../../assets/Login/Wrappergg.png';
 import FacebookPNG from '../../assets/Login/Shapefb.png';
 import TwitterPNG from '../../assets/Login/Shapeapple.png';
+import axios from "axios";
 
 const RegistrationScreen = (props ) => {
   const navigation = useNavigation();
+
   navigation.setOptions({
     headerShown: false,
   });
@@ -27,10 +29,34 @@ const RegistrationScreen = (props ) => {
   const [email, setEmail] = useState("");           // State lưu trữ email
   const [username, setUsername] = useState("");     // State lưu trữ username
   const [password, setPassword] = useState("");     // State lưu trữ password
-
+ const [result, setResult] = useState("");
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
+  const handleSignUp = async () => {
+    try{
+      const res = await axios.post('http://172.20.10.2:5000/api/v1/auth/register', {
+        email: email,
+        name: username,
+        password: password
+      })
+      return res.data;
+
+    }catch(error){
+      console.log(error);
+      return { err: 1, message: "An error occurred" };
+    }
+  }
+  
+  const handleSingUpAcc= async()=>{
+    const resultapi= await handleSignUp();
+
+    if(resultapi.err===0){
+      navigation.navigate('Login');
+      return alert( result.message||'Đăng ký thành công');
+    }
+    return alert(result.message||'Đăng ký thất bại');
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -89,7 +115,9 @@ const RegistrationScreen = (props ) => {
               </View>
 
               {/* Đổi nút Đăng ký thành TouchableOpacity */}
-              <TouchableOpacity style={styles.signupButton}>
+              <TouchableOpacity style={styles.signupButton}
+              onPress={handleSingUpAcc}
+              >
                 <Text style={styles.signupButtonText}>{"Đăng ký"}</Text>
               </TouchableOpacity>
 

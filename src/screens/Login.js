@@ -1,6 +1,4 @@
-import React, { useState } from "react";
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import React, { useState, useLayoutEffect } from "react";
 import { useNavigation } from '@react-navigation/native';
 import {
   SafeAreaView,
@@ -10,22 +8,61 @@ import {
   ImageBackground,
   TouchableOpacity,
   Image,
-  TextInput,
+  TextInput,Alert
 } from "react-native";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import GooglePNG from '../../assets/Login/Wrappergg.png';
 import FacebookPNG from '../../assets/Login/Shapeapple.png';
 import ApplePNG from '../../assets/Login/Shapefb.png';
-
+import axios from 'axios';
 const LoginScreen = (props) => {
   const navigation = useNavigation();
-  navigation.setOptions({
-    headerShown: false,
-  });
+  
+  // Sử dụng useLayoutEffect để thiết lập header options sau khi render lần đầu tiên
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerShown: false,
+    });
+  }, [navigation]);
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [username, setUsername] = useState(""); // State lưu trữ username
   const [password, setPassword] = useState(""); // State lưu trữ password
+  const [isLogin, setIsLogin] = useState(false);
+  const [userId, setUserId] = useState("");
+
+  const [token, setToken] = useState(""); // State for token after successful login
+
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post('http://172.20.10.2:5000/api/v1/auth/login', {
+        email: username,
+        password: password,
+      });
+
+      if (response.data.err === 0) {
+        setIsLogin(true);
+        setToken(response.data.token);
+        setUserId(response.data.data.id);
+        // Alert.alert("Login Successful", "You have logged in successfully.");
+        Alert.alert("Đăng nhập thành công!", `Chào mừng,  ${response.data.data.name}`);
+        navigation.navigate('MyTabs', {
+                user: {
+                    id: response.data.data.id,
+                    name: response.data.data.name,
+                    email: response.data.data.email,
+                },
+            });
+      } else {
+        Alert.alert("Đăng nhập không thành công", response.data.message);
+       setUsername("");
+        setPassword("");
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error", "There was an error logging in.");
+    }
+  };
 
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
@@ -51,7 +88,7 @@ const LoginScreen = (props) => {
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.inputText}
-                placeholder="Username"
+                placeholder="email"
                 value={username}
                 onChangeText={(text) => setUsername(text)} // Cập nhật state username
               />
@@ -76,14 +113,14 @@ const LoginScreen = (props) => {
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
               <Text style={styles.forgotPasswordText}>{"Quên mật khẩu?"}</Text>
             </TouchableOpacity>
 
             {/* Nút Đăng nhập */}
             <TouchableOpacity 
               style={styles.loginButton} 
-              onPress={() => navigation.navigate('MyTabs')} // Chuyển đến MyTabs khi nhấn nút
+              onPress={handleLogin} // Chuyển đến MyTabs khi nhấn nút
             >
               <Text style={styles.loginButtonText}>{"Đăng nhập"}</Text>
             </TouchableOpacity>

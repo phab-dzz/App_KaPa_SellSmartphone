@@ -1,41 +1,58 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
-
-const podcourses = [
-    { id: '1',author: 'Khang Dinh', title: 'Giao Tiếp Với Thiên Nhiên', image: require('../../assets/Podcourse/pod1.png') },
-    { id: '2',author: 'Khang Dinh', title: 'Osho: Cuộc sống & Chân lý', image: require('../../assets/Podcourse/pod2.png') },
-    { id: '3',author: 'Khang Dinh', title: 'Trải Nghiệm Khách Hàng', image: require('../../assets/Podcourse/pod3.png') },
-    { id: '4',author: 'Khang Dinh', title: 'Sức Mạnh Của Sự Tĩnh Lặng', image: require('../../assets/Podcourse/pod4.png') },
-    { id: '5',author: 'Khang Dinh', title: 'Người đàn bà trong tôi', image: require('../../assets/Podcourse/pod5.png') },
-];
+import { useNavigation } from '@react-navigation/native';
 
 const Podcourse = () => {
+    const [podcourses, setPodcourses] = useState([]); // State để lưu dữ liệu từ API
+    const navigation = useNavigation();
+
+    // Hàm lấy dữ liệu từ API
+    const fetchPodcourses = async () => {
+        try {
+            const response = await axios.get('http://172.20.10.2:5000/api/v1/podcast/all');
+            setPodcourses(response.data); // Lưu dữ liệu vào state
+        } catch (error) {
+            console.error('Lỗi khi lấy dữ liệu từ API:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchPodcourses(); // Gọi hàm lấy dữ liệu khi component được render
+    }, []);
+
+    const navigateToVideoScreen = (uri) => {
+        navigation.navigate('VideoScreen', { uri });
+    };
+
     return (
         <FlatList
             horizontal
             data={podcourses}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item, index) => index.toString()} // Dùng index nếu không có id
             renderItem={({ item, index }) => (
-                <TouchableOpacity style={styles.popularPodcourseCard}>
+                <TouchableOpacity
+                    style={styles.popularPodcourseCard}
+                    onPress={() => navigateToVideoScreen(item.audioSrc)} // Navigate to VideoScreen on press
+                >
                     <View style={styles.bookNumberContainer}>
                         <Text style={styles.bookNumberText}>{index + 1}</Text>
                     </View>
-                    <Image source={item.image} style={styles.popularPodcourseImage} />
+                    <Image source={{ uri: item.imgsrc }} style={styles.popularPodcourseImage} />
                     <View style={styles.titleContainer}>
-                        <View style={{flexDirection: 'row', opacity: 0.5, paddingTop: 3}}>
+                        <View style={{ flexDirection: 'row', opacity: 0.5, paddingTop: 3 }}>
                             <Image source={require('../../assets/Podcourse/Podcast-Icon-White.png')} style={styles.podcourseImage} />
-                            <Text style={{color: 'white', marginLeft: 7, justifyContent: 'center', alignSelf: 'center'}}>Podcourse</Text>
+                            <Text style={{ color: 'white', marginLeft: 7, justifyContent: 'center', alignSelf: 'center' }}>Podcourse</Text>
                         </View>
-                        
-                        <Text style={styles.podcourseTitle}>{item.title}</Text>
-                        <Text style={styles.podcourseAuthor}>{item.author}</Text>
+                        <Text style={styles.podcourseTitle}>{item.name}</Text>
+                        <Text style={styles.podcourseAuthor}>{item.host}</Text>
                     </View>
-                    
-                    {/* Nút play với nền đen trong suốt và viền trắng */}
+
+                    {/* Play button */}
                     <TouchableOpacity style={styles.playButton}>
                         <View style={styles.playButtonBackground}>
-                            <Ionicons style={{alignItems:'center', justifyContent:'center'}} name="play" size={35} color="white" />
+                            <Ionicons style={{ alignItems: 'center', justifyContent: 'center' }} name="play" size={35} color="white" />
                         </View>
                     </TouchableOpacity>
                 </TouchableOpacity>
@@ -102,7 +119,6 @@ const styles = StyleSheet.create({
         color: 'white',
         marginBottom: 10,
     },
-
     playButton: {
         position: 'absolute',
         top: '50%',
@@ -110,7 +126,7 @@ const styles = StyleSheet.create({
         transform: [{ translateX: -20 }, { translateY: -20 }],
     },
     playButtonBackground: {
-        backgroundColor: 'rgba(0, 0, 0, 0.6)', // Nền đen trong suốt
+        backgroundColor: 'rgba(0, 0, 0, 0.6)', 
         borderRadius: 25,
         padding: 5,
         borderWidth: 1,
